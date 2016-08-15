@@ -31,7 +31,8 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         collection.delegate = self
         searchBar.delegate = self
         
-        searchBar.returnKeyType = UIReturnKeyType.done
+        let tap = UITapGestureRecognizer(target: self, action: #selector(ViewController.DissmissKeyboard))
+        view.addGestureRecognizer(tap)
         
         parsePokemonCSV()
         //initAudio()
@@ -54,6 +55,10 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     
     // MARK: - Functions
     
+    func DissmissKeyboard() {
+        view.endEditing(true)
+    }
+    
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         view.endEditing(true)
     }
@@ -63,7 +68,7 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         if searchBar.text == nil || searchBar.text == "" {
             inSearchMode = false
             collection.reloadData()
-            view.endEditing(true)
+            //view.endEditing(true)
         }else {
             
             inSearchMode = true
