@@ -23,6 +23,9 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     var musicPlayer: AVAudioPlayer!
     var inSearchMode: Bool = false
     
+    var tap: UITapGestureRecognizer!
+    
+    
     // MARK: - Initialize View
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,8 +34,11 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         collection.delegate = self
         searchBar.delegate = self
         
-        let tap = UITapGestureRecognizer(target: self, action: #selector(ViewController.DissmissKeyboard))
-        view.addGestureRecognizer(tap)
+        tap = UITapGestureRecognizer(target: self, action: #selector(ViewController.DissmissKeyboard))
+        
+        if view.endEditing(false) {
+            view.addGestureRecognizer(tap)
+        }
         
         parsePokemonCSV()
         //initAudio()
@@ -55,8 +61,24 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     
     // MARK: - Functions
     
+    override func prepare(for segue: UIStoryboardSegue, sender: AnyObject?) {
+        
+        if segue.identifier == "PokemonDetailVC" {
+            if let detailsVC = segue.destination as? PokemonDetailVC {
+                if let poke = sender as? Pokemon {
+                    detailsVC.pokemon = poke
+                }
+            }
+        }
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        self.view.endEditing(true)
+    }
+    
     func DissmissKeyboard() {
         view.endEditing(true)
+        view.removeGestureRecognizer(tap)
     }
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
@@ -141,6 +163,17 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         // Action when cell get tapped
+        
+        var poke: Pokemon!
+        
+        if inSearchMode {
+            poke = filteredPokemon[indexPath.row]
+        } else {
+            poke = pokemonArray[indexPath.row]
+        }
+        
+        performSegue(withIdentifier: "PokemonDetailVC", sender: poke)
+        
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
